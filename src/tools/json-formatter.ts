@@ -13,5 +13,6 @@ export default {
   category: "开发工具",
   order: 1,
   tags: ["JSON", "格式化", "开发"],
-  inlineComponent: InlineComp,
+  component: InlineComp,
+  newtab: true,
 };
