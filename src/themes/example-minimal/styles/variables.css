@@ -1,0 +1,45 @@
+/**
+ * CSS 变量覆盖 - 极简风格主题
+ * 
+ * 定义极简风格的 CSS 变量值
+ */
+
+:root {
+  /* 主色系 - 绿松石色 */
+  --color-primary: #14b8a6;
+  --color-primary-hover: #0d9488;
+  --color-primary-light: #ccfbf1;
+
+  /* 文字色系 */
+  --color-text-primary: #134e4a;
+  --color-text-secondary: #5eead4;
+  --color-text-muted: #99f6e4;
+
+  /* 背景色系 */
+  --color-bg-primary: #f0fdfa;
+  --color-bg-secondary: #ccfbf1;
+  --color-bg-card: #ffffff;
+  --color-bg-input: #ffffff;
+
+  /* 边框色系 */
+  --color-border: #5eead4;
+  --color-border-light: #f0fdfa;
+
+  /* 状态色 */
+  --color-success: #22c55e;
+  --color-warning: #f59e0b;
+  --color-danger: #ef4444;
+  --color-info: #06b6d4;
+
+  /* 代码高亮 */
+  --color-code-bg: #134e4a;
+  --color-code-text: #f0fdfa;
+
+  /* 布局变量 */
+  --layout-border-radius: 4px;
+  --layout-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --layout-shadow-hover: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --layout-transition: all 0.15s ease;
+  --layout-container-max-width: 960px;
+  --layout-card-padding: 16px;
+}

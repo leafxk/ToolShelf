@@ -1,0 +1,45 @@
+/**
+ * CSS 变量覆盖 - 默认主题
+ * 
+ * 定义主题特有的 CSS 变量值
+ */
+
+:root {
+  /* 主色系 */
+  --color-primary: #6366f1;
+  --color-primary-hover: #4f46e5;
+  --color-primary-light: #e0e7ff;
+
+  /* 文字色系 */
+  --color-text-primary: #1e293b;
+  --color-text-secondary: #64748b;
+  --color-text-muted: #94a3b8;
+
+  /* 背景色系 */
+  --color-bg-primary: #f8fafc;
+  --color-bg-secondary: #f1f5f9;
+  --color-bg-card: #ffffff;
+  --color-bg-input: #ffffff;
+
+  /* 边框色系 */
+  --color-border: #e2e8f0;
+  --color-border-light: #f1f5f9;
+
+  /* 状态色 */
+  --color-success: #34d399;
+  --color-warning: #fbbf24;
+  --color-danger: #ef4444;
+  --color-info: #60a5fa;
+
+  /* 代码高亮 */
+  --color-code-bg: #1e293b;
+  --color-code-text: #e2e8f0;
+
+  /* 布局变量 */
+  --layout-border-radius: 8px;
+  --layout-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  --layout-shadow-hover: 0 4px 12px rgba(0, 0, 0, 0.15);
+  --layout-transition: all 0.2s ease;
+  --layout-container-max-width: 1200px;
+  --layout-card-padding: 20px;
+}

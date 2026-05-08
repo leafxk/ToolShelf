@@ -1,0 +1,45 @@
+/**
+ * CSS 变量覆盖 - 暗色主题
+ * 
+ * 定义暗色主题特有的 CSS 变量值
+ */
+
+:root {
+  /* 主色系 - 更亮的紫色调，适合暗色背景 */
+  --color-primary: #818cf8;
+  --color-primary-hover: #6366f1;
+  --color-primary-light: #312e81;
+
+  /* 文字色系 - 浅色文字 */
+  --color-text-primary: #f1f5f9;
+  --color-text-secondary: #94a3b8;
+  --color-text-muted: #64748b;
+
+  /* 背景色系 - 深色背景 */
+  --color-bg-primary: #0f172a;
+  --color-bg-secondary: #1e293b;
+  --color-bg-card: #1e293b;
+  --color-bg-input: #334155;
+
+  /* 边框色系 */
+  --color-border: #334155;
+  --color-border-light: #1e293b;
+
+  /* 状态色 */
+  --color-success: #34d399;
+  --color-warning: #fbbf24;
+  --color-danger: #f87171;
+  --color-info: #60a5fa;
+
+  /* 代码高亮 - 更暗的背景 */
+  --color-code-bg: #020617;
+  --color-code-text: #e2e8f0;
+
+  /* 布局变量 */
+  --layout-border-radius: 8px;
+  --layout-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  --layout-shadow-hover: 0 4px 12px rgba(0, 0, 0, 0.4);
+  --layout-transition: all 0.2s ease;
+  --layout-container-max-width: 1200px;
+  --layout-card-padding: 20px;
+}

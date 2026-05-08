@@ -451,17 +451,17 @@ async function downloadPDF() {
 
 /* ========== 操作面板 ========== */
 .control-panel {
-  background: #f8fafc;
-  border-radius: 12px;
+  background: var(--color-bg-secondary);
+  border-radius: var(--layout-border-radius);
   padding: 24px;
   margin-bottom: 20px;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--color-border);
 }
 
 .control-panel h2 {
   margin: 0 0 20px 0;
   font-size: 1.3rem;
-  color: #1e293b;
+  color: var(--color-text-primary);
 }
 
 .control-row {
@@ -479,7 +479,7 @@ async function downloadPDF() {
 
 .control-group label {
   font-weight: 600;
-  color: #475569;
+  color: var(--color-text-secondary);
   min-width: 100px;
   font-size: 0.9rem;
 }
@@ -487,18 +487,19 @@ async function downloadPDF() {
 .control-group select,
 .control-group input[type="text"] {
   padding: 8px 12px;
-  border: 1px solid #cbd5e1;
+  border: 1px solid var(--color-border);
   border-radius: 6px;
   font-size: 0.9rem;
-  background: #fff;
+  background: var(--color-bg-input);
+  color: var(--color-text-primary);
   min-width: 140px;
 }
 
 .control-group select:focus,
 .control-group input[type="text"]:focus {
   outline: none;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
 }
 
 .file-input {
@@ -521,7 +522,7 @@ async function downloadPDF() {
 }
 
 .hint {
-  color: #94a3b8;
+  color: var(--color-text-muted);
   font-size: 0.85rem;
 }
 
@@ -529,7 +530,7 @@ async function downloadPDF() {
 .btn {
   padding: 8px 18px;
   border: none;
-  border-radius: 6px;
+  border-radius: var(--layout-border-radius);
   font-size: 0.88rem;
   cursor: pointer;
   transition: all 0.2s;
@@ -546,29 +547,29 @@ async function downloadPDF() {
 }
 
 .btn-primary {
-  background: #3b82f6;
+  background: var(--color-primary);
   color: #fff;
 }
 .btn-primary:hover {
-  background: #2563eb;
+  background: var(--color-primary-hover);
 }
 
 .btn-secondary {
-  background: #64748b;
+  background: var(--color-text-secondary);
   color: #fff;
 }
 .btn-secondary:hover {
-  background: #475569;
+  background: var(--color-text-muted);
 }
 
 .btn-outline {
   background: transparent;
-  border: 1px solid #cbd5e1;
-  color: #64748b;
+  border: 1px solid var(--color-border);
+  color: var(--color-text-secondary);
 }
 .btn-outline:hover {
-  background: #f1f5f9;
-  border-color: #94a3b8;
+  background: var(--color-bg-secondary);
+  border-color: var(--color-text-muted);
 }
 
 .btn-sm {
@@ -584,8 +585,8 @@ async function downloadPDF() {
 
 /* ========== 名单预览 ========== */
 .name-preview {
-  background: #eff6ff;
-  border-radius: 8px;
+  background: var(--color-primary-light);
+  border-radius: var(--layout-border-radius);
   padding: 12px 16px;
   margin-bottom: 20px;
   display: flex;
@@ -597,8 +598,8 @@ async function downloadPDF() {
 }
 
 .name-tag {
-  background: #dbeafe;
-  color: #1d4ed8;
+  background: var(--color-bg-card);
+  color: var(--color-primary);
   padding: 2px 10px;
   border-radius: 12px;
   font-weight: 500;
@@ -617,7 +618,7 @@ async function downloadPDF() {
   padding: 12mm 12mm;
   background: #fff;
   box-sizing: border-box;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  box-shadow: var(--layout-shadow);
 }
 
 .table-title {
@@ -684,7 +685,7 @@ async function downloadPDF() {
 .empty-state {
   text-align: center;
   padding: 60px 20px;
-  color: #94a3b8;
+  color: var(--color-text-muted);
 }
 
 .empty-icon {
@@ -699,7 +700,7 @@ async function downloadPDF() {
 
 .empty-state .hint {
   font-size: 0.88rem;
-  color: #cbd5e1;
+  color: var(--color-border);
 }
 
 /* ========== 打印样式（全局，非 scoped — 必须覆盖父组件 ToolPage） ========== */

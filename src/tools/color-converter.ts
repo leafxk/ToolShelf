@@ -14,5 +14,6 @@ export default {
   order: 2,
   tags: ["颜色", "CSS", "设计"],
   component: PageComp,
+  // inlineComponent: PageComp,
   newtab: true,
 };

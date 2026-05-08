@@ -57,14 +57,15 @@ async function copy() {
 }
 .json-input {
   width: 100%;
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--layout-border-radius);
   padding: 10px;
   font-family: 'Fira Code', monospace;
   font-size: 13px;
   resize: vertical;
   box-sizing: border-box;
-  background: #f8fafc;
+  background: var(--color-bg-input);
+  color: var(--color-text-primary);
 }
 .btn-row {
   display: flex;
@@ -73,39 +74,40 @@ async function copy() {
 }
 .btn {
   padding: 6px 14px;
-  border: 1px solid #e2e8f0;
-  border-radius: 6px;
-  background: white;
+  border: 1px solid var(--color-border);
+  border-radius: var(--layout-border-radius);
+  background: var(--color-bg-card);
   cursor: pointer;
   font-size: 13px;
   transition: all 0.15s;
+  color: var(--color-text-secondary);
 }
 .btn:hover {
-  border-color: #6366f1;
-  color: #6366f1;
+  border-color: var(--color-primary);
+  color: var(--color-primary);
 }
 .btn-primary {
-  background: #6366f1;
+  background: var(--color-primary);
   color: white;
-  border-color: #6366f1;
+  border-color: var(--color-primary);
 }
 .btn-primary:hover {
-  background: #4f46e5;
+  background: var(--color-primary-hover);
   color: white;
 }
 .json-output {
   margin-top: 10px;
-  background: #1e293b;
-  color: #e2e8f0;
+  background: var(--color-code-bg);
+  color: var(--color-code-text);
   padding: 12px;
-  border-radius: 8px;
+  border-radius: var(--layout-border-radius);
   overflow-x: auto;
   font-size: 12px;
   max-height: 200px;
   overflow-y: auto;
 }
 .error {
-  color: #ef4444;
+  color: var(--color-danger);
   font-size: 13px;
   margin-top: 8px;
 }

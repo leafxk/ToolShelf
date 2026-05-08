@@ -1,26 +1,10 @@
 import { createApp } from 'vue'
 import { createRouter, createWebHashHistory } from 'vue-router'
 import App from './App.vue'
-import './style.css'
+import './styles/variables.css'
 
 // ============================================================
 // 🔮 核心机制：工具自动发现
-// ============================================================
-// 约定：
-//   1. 每个工具放在 src/tools/ 目录下，一个工具 = 一个 .ts 文件
-//   2. 文件必须默认导出一个 ToolMeta 对象（见 ToolMeta 接口）
-//   3. 导出 component / inlineComponent 决定工具的展示能力
-//
-// 四种模式：
-//   - inlineComponent → 内嵌（卡片内展开）
-//   - component       → 页面跳转（当前页跳转，← 返回主页）
-//   - newtab          → 新标签页打开（✕ 关闭页面）
-//   - externalUrl     → 外部链接
-//
-// 新增工具步骤：
-//   ① 在 src/tools/ 下新建 xxx.ts
-//   ② 导出符合 ToolMeta 的对象
-//   ③ ✅ 完成！主页自动发现，无需改动任何其他文件
 // ============================================================
 
 const toolModules = import.meta.glob('./tools/*.ts', { eager: true })
@@ -34,14 +18,63 @@ const tools = Object.entries(toolModules)
   .filter(Boolean)
   .sort((a, b) => (a.order ?? 99) - (b.order ?? 99))
 
-// 自动生成路由：所有有组件的工具都注册路由
-// 统一使用 ToolPage 容器，由容器内部根据 toolId 查找并渲染对应组件 + 导航栏
+// ============================================================
+// 🖼️ 主题系统：动态加载页面组件
+// ============================================================
+
+import { CURRENT_THEME, FOLLOW_SYSTEM_THEME } from './config/theme.js'
+import { getTheme, resolveThemePath, detectSystemTheme, themes } from './themes/index.js'
+
+function getActiveThemeId() {
+  if (FOLLOW_SYSTEM_THEME) {
+    return detectSystemTheme()
+  }
+  return CURRENT_THEME
+}
+
+const activeThemeId = getActiveThemeId()
+const activeTheme = getTheme(activeThemeId)
+
+/**
+ * 获取主题页面组件路径
+ * 优先使用当前主题的页面，否则回退到 _base 主题
+ */
+function getThemePagePath(pageName) {
+  if (!activeTheme || !activeTheme.pages) {
+    return `./pages/${pageName}.vue`
+  }
+  
+  const relativePath = activeTheme.pages[pageName]
+  
+  if (!relativePath) {
+    // 回退到 _base 主题
+    const baseTheme = themes['_base']
+    const basePath = baseTheme?.pages?.[pageName]
+    if (basePath) {
+      return `/src/themes/_base/${basePath}`
+    }
+    return `./pages/${pageName}.vue`
+  }
+  
+  // 如果路径是相对路径（以 ./ 开头），说明来自 _base
+  if (relativePath.startsWith('./')) {
+    return `/src/themes/_base/${relativePath}`
+  }
+  
+  // 否则使用当前主题的路径
+  return `/src/themes/${activeThemeId}/${relativePath}`
+}
+
+const HomePagePath = getThemePagePath('HomePage')
+const ToolPagePath = getThemePagePath('ToolPage')
+
+// 自动生成路由
 const toolRoutes = tools
   .filter(t => t.component || t.inlineComponent)
   .map(t => ({
     path: `/tool/${t.id}`,
     name: t.id,
-    component: () => import('./pages/ToolPage.vue'),
+    component: () => import(/* @vite-ignore */ ToolPagePath),
     meta: {
       title: t.name,
       toolId: t.id,
@@ -55,7 +88,7 @@ const router = createRouter({
     {
       path: '/',
       name: 'home',
-      component: () => import('./pages/HomePage.vue'),
+      component: () => import(/* @vite-ignore */ HomePagePath),
     },
     {
       path: '/:pathMatch(.*)*',
@@ -67,7 +100,38 @@ const router = createRouter({
 const app = createApp(App)
 app.use(router)
 
-// 把工具列表注入全局，所有组件都可访问
+// 注入工具列表
 app.config.globalProperties.$tools = tools
+
+// 注入主题信息
+app.config.globalProperties.$theme = activeTheme
+app.config.globalProperties.$themeId = activeThemeId
+
+// 注入主题组件注册表
+// 页面组件可以从这里获取主题特定的组件
+const themeComponents = {}
+
+// 预加载主题组件（ToolCard）
+if (activeTheme && activeTheme.components) {
+  const toolCardPath = activeTheme.components.ToolCard
+  if (toolCardPath) {
+    let importPath
+    // 如果路径是相对路径（以 ./ 开头），相对于当前主题目录
+    if (toolCardPath.startsWith('./')) {
+      importPath = `/src/themes/${activeThemeId}/${toolCardPath}`
+    } else {
+      importPath = `/src/themes/${activeThemeId}/${toolCardPath}`
+    }
+    importPath = importPath.replace(/^\/src\//, './')
+    themeComponents.ToolCard = () => import(/* @vite-ignore */ importPath)
+  }
+}
+
+// 如果主题没有覆盖 ToolCard，使用默认的
+if (!themeComponents.ToolCard) {
+  themeComponents.ToolCard = () => import('./components/ToolCard.vue')
+}
+
+app.config.globalProperties.$themeComponents = themeComponents
 
 app.mount('#app')

@@ -19,11 +19,9 @@
         class="search-input"
         @input="onSearch"
       />
-      <button
-        v-if="searchQuery"
-        class="clear-btn"
-        @click="searchQuery = ''"
-      >✕</button>
+      <button v-if="searchQuery" class="clear-btn" @click="searchQuery = ''">
+        ✕
+      </button>
     </div>
 
     <!-- 分类过滤标签（搜索时隐藏） -->
@@ -44,12 +42,8 @@
     </div>
 
     <!-- 工具卡片网格 -->
-    <div class="tool-grid">
-      <ToolCard
-        v-for="tool in filteredTools"
-        :key="tool.id"
-        :tool="tool"
-      />
+    <div class="tool-list">
+      <ToolCard v-for="tool in filteredTools" :key="tool.id" :tool="tool" />
     </div>
 
     <!-- 空状态 -->
@@ -67,50 +61,64 @@
 </template>
 
 <script setup>
-import { computed, ref, getCurrentInstance } from 'vue'
-import ToolCard from '../components/ToolCard.vue'
-
-const app = getCurrentInstance()
-const tools = computed(() => app.appContext.config.globalProperties.$tools || [])
+import { computed, ref, shallowRef, getCurrentInstance, onMounted } from "vue";
+import defaultToolCard from "../../../components/ToolCard.vue";
 
 // 自动提取所有分类
-const categories = computed(() => {
-  const cats = [...new Set(tools.value.map(t => t.category).filter(Boolean))]
-  return ['全部', ...cats]
-})
+const app = getCurrentInstance();
+const tools = computed(() => {
+  return app?.appContext.config.globalProperties.$tools || [];
+});
 
-const activeCategory = ref('全部')
-const searchQuery = ref('')
+// 从主题注册表获取 ToolCard
+const ToolCard = shallowRef(defaultToolCard);
+
+onMounted(async () => {
+  const themeComponents =
+    app?.appContext.config.globalProperties.$themeComponents || {};
+  if (themeComponents.ToolCard) {
+    const module = await themeComponents.ToolCard();
+    ToolCard.value = module.default || module;
+  }
+});
+
+const categories = computed(() => {
+  const cats = [...new Set(tools.value.map((t) => t.category).filter(Boolean))];
+  return ["全部", ...cats];
+});
+
+const activeCategory = ref("全部");
+const searchQuery = ref("");
 
 /** 搜索过滤：匹配名称、描述、标签 */
 const filteredTools = computed(() => {
-  let list = tools.value
+  let list = tools.value;
 
   // 分类过滤
-  if (activeCategory.value !== '全部' && !searchQuery.value) {
-    list = list.filter(t => t.category === activeCategory.value)
+  if (activeCategory.value !== "全部" && !searchQuery.value) {
+    list = list.filter((t) => t.category === activeCategory.value);
   }
 
   // 搜索关键词
-  const q = searchQuery.value.trim().toLowerCase()
+  const q = searchQuery.value.trim().toLowerCase();
   if (q) {
-    list = list.filter(t => {
+    list = list.filter((t) => {
       return (
         t.name.toLowerCase().includes(q) ||
         t.description.toLowerCase().includes(q) ||
-        (t.tags && t.tags.some(tag => tag.toLowerCase().includes(q))) ||
+        (t.tags && t.tags.some((tag) => tag.toLowerCase().includes(q))) ||
         (t.category && t.category.toLowerCase().includes(q))
-      )
-    })
+      );
+    });
   }
 
-  return list
-})
+  return list;
+});
 
 function onSearch() {
   // 搜索时自动切换到"全部"分类以显示所有匹配结果
   if (searchQuery.value) {
-    activeCategory.value = '全部'
+    activeCategory.value = "全部";
   }
 }
 </script>
@@ -120,6 +128,10 @@ function onSearch() {
   max-width: 960px;
   margin: 0 auto;
   padding: 24px 16px;
+  /* 新增：使用 Flex 布局实现 Sticky Footer */
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
 }
 .top-bar {
   display: flex;
@@ -132,7 +144,9 @@ function onSearch() {
   align-items: center;
   gap: 12px;
 }
-.brand-icon { font-size: 28px; }
+.brand-icon {
+  font-size: 28px;
+}
 .brand h1 {
   font-size: 24px;
   font-weight: 700;
@@ -165,7 +179,10 @@ function onSearch() {
   border-color: var(--color-primary);
   box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.08);
 }
-.search-icon { font-size: 16px; flex-shrink: 0; }
+.search-icon {
+  font-size: 16px;
+  flex-shrink: 0;
+}
 .search-input {
   flex: 1;
   border: none;
@@ -174,7 +191,9 @@ function onSearch() {
   color: var(--color-text-primary);
   background: transparent;
 }
-.search-input::placeholder { color: var(--color-text-muted); }
+.search-input::placeholder {
+  color: var(--color-text-muted);
+}
 .clear-btn {
   flex-shrink: 0;
   width: 22px;
@@ -216,7 +235,9 @@ function onSearch() {
   font-size: 13px;
   transition: var(--layout-transition);
 }
-.tab:hover { border-color: var(--color-primary-light); }
+.tab:hover {
+  border-color: var(--color-primary-light);
+}
 .tab.active {
   background: var(--color-primary);
   color: white;
@@ -228,10 +249,19 @@ function onSearch() {
   gap: 16px;
   align-items: start;
 }
+.tool-list {
+  display: flex;
+  flex-direction: column;
+  max-width: var(--layout-container-max-width);
+  /* 新增：让工具列表占据剩余空间，将 footer 推到底部 */
+  flex: 1;
+}
 .empty-state {
   text-align: center;
   padding: 60px 20px;
   color: var(--color-text-muted);
+  /* 新增：让空状态页也占据剩余空间，确保 footer 在底部 */
+  flex: 1;
 }
 .empty-state .hint {
   font-size: 13px;
