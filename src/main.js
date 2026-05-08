@@ -4,9 +4,8 @@ import App from './App.vue'
 import './styles/variables.css'
 
 // ============================================================
-// 🔮 核心机制：工具自动发现
+// 🔮 工具自动发现
 // ============================================================
-
 const toolModules = import.meta.glob('./tools/*.ts', { eager: true })
 
 const tools = Object.entries(toolModules)
@@ -19,11 +18,20 @@ const tools = Object.entries(toolModules)
   .sort((a, b) => (a.order ?? 99) - (b.order ?? 99))
 
 // ============================================================
-// 🖼️ 主题系统：动态加载页面组件
+// 🖼️ 主题系统
 // ============================================================
-
 import { CURRENT_THEME, FOLLOW_SYSTEM_THEME } from './config/theme.js'
-import { getTheme, resolveThemePath, detectSystemTheme, themes } from './themes/index.js'
+import { getTheme, detectSystemTheme } from './themes/index.js'
+
+// 预声明所有页面（Vite glob 键格式是 /src/...）
+const basePages = import.meta.glob('/src/themes/_base/pages/*.vue')
+const themePages = import.meta.glob('/src/themes/*/pages/*.vue')
+const rootPages = import.meta.glob('/src/pages/*.vue')
+
+// 预声明所有 ToolCard 组件
+const baseToolCards = import.meta.glob('/src/themes/_base/components/ToolCard.vue')
+const themeToolCards = import.meta.glob('/src/themes/*/components/ToolCard.vue')
+const rootToolCards = import.meta.glob('/src/components/ToolCard.vue')
 
 function getActiveThemeId() {
   if (FOLLOW_SYSTEM_THEME) {
@@ -36,37 +44,46 @@ const activeThemeId = getActiveThemeId()
 const activeTheme = getTheme(activeThemeId)
 
 /**
- * 获取主题页面组件路径
- * 优先使用当前主题的页面，否则回退到 _base 主题
+ * 获取主题页面组件
  */
-function getThemePagePath(pageName) {
-  if (!activeTheme || !activeTheme.pages) {
-    return `./pages/${pageName}.vue`
+function getThemePage(pageName) {
+  // 如果主题没有配置页面，回退到 root
+  if (!activeTheme || !activeTheme.pages || !activeTheme.pages[pageName]) {
+    return rootPages[`/src/pages/${pageName}.vue`]
   }
   
   const relativePath = activeTheme.pages[pageName]
   
-  if (!relativePath) {
-    // 回退到 _base 主题
-    const baseTheme = themes['_base']
-    const basePath = baseTheme?.pages?.[pageName]
-    if (basePath) {
-      return `/src/themes/_base/${basePath}`
-    }
-    return `./pages/${pageName}.vue`
-  }
-  
-  // 如果路径是相对路径（以 ./ 开头），说明来自 _base
+  // 如果路径是相对路径（以 ./ 开头），来自 _base 主题
   if (relativePath.startsWith('./')) {
-    return `/src/themes/_base/${relativePath}`
+    return basePages[`/src/themes/_base/${relativePath}`]
   }
   
-  // 否则使用当前主题的路径
-  return `/src/themes/${activeThemeId}/${relativePath}`
+  // 使用当前主题的路径
+  return themePages[`/src/themes/${activeThemeId}/${relativePath}`]
 }
 
-const HomePagePath = getThemePagePath('HomePage')
-const ToolPagePath = getThemePagePath('ToolPage')
+/**
+ * 获取 ToolCard 组件
+ */
+function getToolCard() {
+  if (!activeTheme || !activeTheme.components || !activeTheme.components.ToolCard) {
+    return baseToolCards['/src/themes/_base/components/ToolCard.vue']
+  }
+  
+  const toolCardPath = activeTheme.components.ToolCard
+  
+  if (toolCardPath.startsWith('./')) {
+    return themeToolCards[`/src/themes/${activeThemeId}/${toolCardPath}`]
+  }
+  
+  return themeToolCards[`/src/themes/${activeThemeId}/${toolCardPath}`]
+}
+
+// 获取实际的组件
+const HomePage = getThemePage('HomePage')
+const ToolPage = getThemePage('ToolPage')
+const ToolCardImporter = getToolCard()
 
 // 自动生成路由
 const toolRoutes = tools
@@ -74,7 +91,7 @@ const toolRoutes = tools
   .map(t => ({
     path: `/tool/${t.id}`,
     name: t.id,
-    component: () => import(/* @vite-ignore */ ToolPagePath),
+    component: ToolPage,
     meta: {
       title: t.name,
       toolId: t.id,
@@ -88,7 +105,7 @@ const router = createRouter({
     {
       path: '/',
       name: 'home',
-      component: () => import(/* @vite-ignore */ HomePagePath),
+      component: HomePage,
     },
     {
       path: '/:pathMatch(.*)*',
@@ -108,30 +125,8 @@ app.config.globalProperties.$theme = activeTheme
 app.config.globalProperties.$themeId = activeThemeId
 
 // 注入主题组件注册表
-// 页面组件可以从这里获取主题特定的组件
-const themeComponents = {}
-
-// 预加载主题组件（ToolCard）
-if (activeTheme && activeTheme.components) {
-  const toolCardPath = activeTheme.components.ToolCard
-  if (toolCardPath) {
-    let importPath
-    // 如果路径是相对路径（以 ./ 开头），相对于当前主题目录
-    if (toolCardPath.startsWith('./')) {
-      importPath = `/src/themes/${activeThemeId}/${toolCardPath}`
-    } else {
-      importPath = `/src/themes/${activeThemeId}/${toolCardPath}`
-    }
-    importPath = importPath.replace(/^\/src\//, './')
-    themeComponents.ToolCard = () => import(/* @vite-ignore */ importPath)
-  }
+app.config.globalProperties.$themeComponents = {
+  ToolCard: ToolCardImporter,
 }
-
-// 如果主题没有覆盖 ToolCard，使用默认的
-if (!themeComponents.ToolCard) {
-  themeComponents.ToolCard = () => import('./components/ToolCard.vue')
-}
-
-app.config.globalProperties.$themeComponents = themeComponents
 
 app.mount('#app')
